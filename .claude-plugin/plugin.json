@@ -1,0 +1,5 @@
+{
+  "name": "ayan-skill",
+  "version": "0.1.0",
+  "description": "Skills for running the ayan code-review bot from Claude Code: local commits, working-tree edits, and GitHub PRs (dry-run or posting comments)."
+}
