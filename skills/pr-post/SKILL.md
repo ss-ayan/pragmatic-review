@@ -1,7 +1,7 @@
 ---
-name: ayan-review-pr-post
-description: Review a GitHub pull request with ayan AND post inline comments, a summary, and (optionally) an approval directly to the PR. Use ONLY when the user has explicitly asked for a live review on the PR — this writes to GitHub. For previewing first, use ayan-review-pr-dryrun.
-allowed-tools: Bash(ayan review *), Bash(gh pr view *), Bash(gh auth status), Read
+name: pr-post
+description: Review a GitHub pull request with ayan AND post inline comments, a summary, and (optionally) an approval directly to the PR. Use ONLY when the user has explicitly asked for a live review on the PR — this writes to GitHub. For previewing first, use pr-dryrun.
+allowed-tools: Bash(ayan *), Bash(gh pr view *), Bash(gh auth status), Read
 ---
 
 ## When to use this skill
@@ -14,9 +14,9 @@ Invoke ONLY when the user has explicitly asked for ayan to leave comments on the
 - "Approve PR #N with ayan if it's clean" (use `--approve`)
 
 DO NOT invoke this skill when:
-- The user said "dry run", "preview", "without posting", "before posting" — use `ayan-review-pr-dryrun`.
-- No PR URL is in scope — use `ayan-review-local`.
-- The user is unsure whether to post — default to `ayan-review-pr-dryrun` and ask.
+- The user said "dry run", "preview", "without posting", "before posting" — use `pr-dryrun`.
+- No PR URL is in scope — use `local`.
+- The user is unsure whether to post — default to `pr-dryrun` and ask.
 
 ## What live mode does
 
@@ -29,15 +29,9 @@ DO NOT invoke this skill when:
 
 Posting is irreversible — the comments are visible to anyone with PR access immediately. Confirm intent before invoking.
 
-## Authentication
+## Requires
 
-Requires `GITHUB_TOKEN` (with write permissions on the repo) OR `gh auth login`. Check:
-
-```bash
-gh auth status
-```
-
-Token must have `repo` scope; reviewer-only tokens cannot post comments. If auth fails, stop and surface the error.
+This skill requires ayan **v4.0.13 or later** and a `GITHUB_TOKEN` (with `repo` write scope) OR `gh auth login` with write access. Reviewer-only tokens cannot post comments. Step 1 verifies.
 
 ## Confirmation gate
 
@@ -55,15 +49,13 @@ Wait for explicit "yes" / "go". Don't proceed on ambiguous responses.
 ayan review https://github.com/org/repo/pull/42
 ```
 
-Posts inline + summary + replies. Does NOT submit an approval.
-
 ### 2. Live review with approval gate
 
 ```bash
 ayan review --approve https://github.com/org/repo/pull/42
 ```
 
-After posting comments, if there are zero blocker-severity findings, ayan submits an APPROVE review. If any blocker exists, the approval is skipped and a WARN is logged. The comments are posted regardless.
+After posting comments, if there are zero blocker-severity findings, ayan submits an APPROVE review.
 
 ### 3. Force re-review (override dedup)
 
@@ -71,24 +63,45 @@ After posting comments, if there are zero blocker-severity findings, ayan submit
 ayan review --force https://github.com/org/repo/pull/42
 ```
 
-Bypasses the "already reviewed this commit" check. Use when ayan was last run against an older commit and the user explicitly wants a fresh pass on the same SHA.
-
 ### 4. Custom config
 
 ```bash
 ayan review --config /path/to/ayan.yaml https://github.com/org/repo/pull/42
 ```
 
-Useful for repo-specific severity thresholds or model selection.
+### 5. Restrict analyzers (`--only` / `--skip`)
+
+```bash
+ayan review --skip slop https://github.com/org/repo/pull/42        # full review minus slop (faster)
+ayan review --only security https://github.com/org/repo/pull/42    # security-only review
+```
 
 ## Steps
 
-1. Re-read the user's request — is the intent definitely "post to GitHub"? If ambiguous, ask first.
-2. Check auth: `gh auth status`. Surface error if token has no write access.
-3. Confirm the PR is in the expected state: `gh pr view <URL> --json state,isDraft,headRefName`. If the PR is draft, ayan will skip by default (`skip_drafts: true`) — warn the user and offer to flip via config.
-4. State the confirmation gate (above), wait for explicit go.
+1. **Pre-flight: verify ayan + write-scoped GitHub auth.**
+   ```bash
+   ayan version
+   gh auth status
+   ```
+   Surface error if ayan is missing/old or token lacks write access.
+
+2. Re-read the user's request — is the intent definitely "post to GitHub"? If ambiguous, ask before continuing.
+
+3. Confirm the PR is in the expected state:
+   ```bash
+   gh pr view <URL> --json state,isDraft,headRefName
+   ```
+   If the PR is draft, ayan will skip by default — warn the user.
+
+4. State the confirmation gate (above), wait for explicit "go".
+
 5. Run `ayan review <URL>` (with `--approve` if requested).
-6. Watch the heartbeat. On completion, fetch the PR comments to confirm: `gh pr view <URL> --comments | head -50`.
+
+6. Watch the heartbeat. On completion, fetch the PR comments to confirm:
+   ```bash
+   gh pr view <URL> --comments | head -50
+   ```
+
 7. Report back: "Posted N inline + M summary [+ approval]. PR is at <URL>."
 
 ## Heartbeat & latency
@@ -99,11 +112,11 @@ Live PR reviews emit the same heartbeat as dry-run. Wait for completion — inte
 
 - **Auth 401/403**: token lacks write scope. Stop and ask user to refresh credentials.
 - **PR closed/merged**: ayan still runs but comments are posted on a closed PR. Warn the user.
-- **Rate limited**: GitHub returns 429. ayan retries with backoff; if it ultimately fails, partial comments may already be posted. Surface the error and let the user decide whether to rerun with `--force`.
+- **Rate limited**: GitHub returns 429. ayan retries with backoff; partial comments may already be posted. Surface and let the user decide whether to rerun with `--force`.
 
 ## Don'ts
 
 - Don't run without an explicit user-side "post to GitHub" confirmation. The wrong default is to post.
-- Don't run `--approve` on a PR the user hasn't authorized you to approve. Approvals carry weight; don't pass them out automatically.
+- Don't run `--approve` on a PR the user hasn't authorized you to approve. Approvals carry weight.
 - Don't run on a draft PR without flagging that draft-skip is configured (the run will be a no-op).
 - Don't paste the full transcript back to the user after a live run — the comments are on GitHub now, so summarize instead.

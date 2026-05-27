@@ -1,5 +1,9 @@
 {
-  "name": "ayan-skill",
-  "version": "0.1.0",
-  "description": "Skills for running the ayan code-review bot from Claude Code: local commits, working-tree edits, and GitHub PRs (dry-run or posting comments)."
+  "name": "pragmatic-review",
+  "version": "0.2.0",
+  "description": "Comprehensive code review via the ayan bot: idiom, slop, security, static analysis, and pragmatism checks against local commits, working-tree edits, or GitHub PRs.",
+  "homepage": "https://github.com/ss-ayan/pragmatic-review",
+  "requires": {
+    "ayan_version": ">=4.0.13"
+  }
 }
