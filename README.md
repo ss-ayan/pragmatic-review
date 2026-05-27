@@ -19,7 +19,7 @@ Local and PR-dry-run skills emit findings as a markdown transcript to a file or 
 - **Claude Code CLI** installed and signed in
 - **For PR modes:** `gh auth login` or `GITHUB_TOKEN`
 
-Install ayan first → see [github.com/ss-ayan/ayan](https://github.com/ss-ayan/ayan) for binary tarballs or Docker images.
+Install ayan first → see the [ss-ayan org page](https://github.com/ss-ayan) for the Docker install path (`docker pull ghcr.io/ss-ayan/ayan:latest` + shell shim).
 
 ## Install the plugin
 
@@ -113,7 +113,7 @@ To upgrade either side:
 
 | Side | Where |
 |---|---|
-| ayan binary | [github.com/ss-ayan/ayan/releases](https://github.com/ss-ayan/ayan/releases) |
+| ayan binary | `docker pull ghcr.io/ss-ayan/ayan:latest` (then re-create the shim) |
 | pragmatic-review plugin | `cd pragmatic-review && git pull` (or reinstall via marketplace) |
 
 ## Adding a skill
