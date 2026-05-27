@@ -81,10 +81,10 @@ ayan review --dry-run --config /path/to/ayan.yaml https://github.com/org/repo/pu
 
 1. **Pre-flight: verify ayan + GitHub auth.**
    ```bash
-   ayan version
+   ayan version --check v4.0.13
    gh auth status
    ```
-   If `ayan` isn't found or version is below v4.0.13, stop and tell the user to install/upgrade. If `gh auth status` fails, stop and tell them to run `gh auth login`.
+   On non-zero exit from `ayan version --check`, stop and surface the stderr message (install/upgrade ayan). If `gh auth status` fails, stop and tell the user to run `gh auth login`.
 
 2. Confirm the PR URL is valid:
    ```bash

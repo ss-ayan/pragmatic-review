@@ -58,10 +58,10 @@ ayan profile https://github.com/org/repo
 
 1. **Pre-flight: verify ayan + GitHub auth.**
    ```bash
-   ayan version
+   ayan version --check v4.0.13
    gh auth status
    ```
-   If `ayan` isn't found or version < v4.0.13, stop. If auth fails, stop.
+   On non-zero exit from `ayan version --check`, stop and surface the stderr message. If `gh auth status` fails, stop and tell the user to run `gh auth login`.
 
 2. Run profile:
    ```bash

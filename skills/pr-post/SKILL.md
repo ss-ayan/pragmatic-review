@@ -80,10 +80,10 @@ ayan review --only security https://github.com/org/repo/pull/42    # security-on
 
 1. **Pre-flight: verify ayan + write-scoped GitHub auth.**
    ```bash
-   ayan version
+   ayan version --check v4.0.13
    gh auth status
    ```
-   Surface error if ayan is missing/old or token lacks write access.
+   On non-zero exit from `ayan version --check`, stop and surface the stderr message. If `gh auth status` shows the token lacks write access, stop and ask the user to refresh credentials.
 
 2. Re-read the user's request — is the intent definitely "post to GitHub"? If ambiguous, ask before continuing.
 

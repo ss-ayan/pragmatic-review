@@ -92,9 +92,9 @@ Default is the current working directory.
 
 1. **Pre-flight: verify ayan is installed and recent enough.** Run:
    ```bash
-   ayan version
+   ayan version --check v4.0.13
    ```
-   If the command isn't found, stop and tell the user: "`ayan` binary not found on PATH. Install via `https://github.com/ss-ayan` (binary or Docker)." If the printed version is older than `v4.0.13`, tell the user: "ayan version is too old; this skill needs v4.0.13+. Upgrade and re-run." Do NOT continue past this step.
+   On success (exit code 0), continue. On non-zero exit, stop and surface the stderr message to the user (it's either "binary not found" or "version too old; install/upgrade via https://github.com/ss-ayan"). Do NOT continue past this step.
 
 2. Confirm the user is in a git repo:
    ```bash
