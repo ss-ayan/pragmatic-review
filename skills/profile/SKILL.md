@@ -1,82 +1,19 @@
 ---
 name: profile
-description: Profile a repository to teach ayan its conventions, naming patterns, and idioms. Run once when bootstrapping ayan on a new repo or after major refactors so future reviews ground on the repo's actual style instead of language defaults. Not a code review — this populates a knowledge base.
-allowed-tools: Bash(ayan *), Read
+description: Profile a repository so ayan learns its conventions and uses them in later reviews. Run once when onboarding a repo or after a major refactor. Not a code review.
+allowed-tools: Bash(ayan *), Bash(gh auth status), Bash(*install-ayan.sh), Read
 ---
+## When to use
+- Onboarding ayan on a repo, or after the repo's conventions changed a lot.
+- Not for reviewing code: use `local`, `pr-dryrun` or `pr-post`.
 
-## When to use this skill
-
-Invoke when:
-- The user is onboarding ayan onto a new repo: "set up ayan for this repo" / "teach ayan our conventions".
-- The repo's conventions have drifted (large refactor, new style guide) and the user wants ayan to re-learn.
-- Future review quality has been low and the user asks why ayan is missing the repo's conventions.
-
-Skip when:
-- The user just wants a review — that's `local` / `pr-dryrun` / `pr-post`. Profiling does NOT review code.
-- The repo has already been profiled recently and nothing major has changed.
-
-## What profiling does
-
-`ayan profile --repo org/repo` clones the repo at a given ref and runs multi-pass analysis to extract:
-
-- **Naming conventions** — function casing, file naming, package layout
-- **Error-handling idioms** — wrap/unwrap patterns, fmt.Errorf style, custom error types
-- **Test patterns** — table-driven vs case-per-test, naming
-- **Architecture signals** — directory roles, layering rules, common patterns
-- **Style preferences** picked up from `.golangci.yml`, `.editorconfig`, `CONTRIBUTING.md`, `CLAUDE.md`
-
-Output is a set of `Convention` records persisted to ayan's storage. Future review runs grep that store and surface findings phrased in terms of the repo's own conventions.
-
-## Requires
-
-This skill requires ayan **v0.0.1 or later** and either `GITHUB_TOKEN` env var or `gh auth login`. Step 1 verifies.
-
-## Invocation
-
-### 1. Profile main branch (most common)
-
-```bash
-ayan profile --repo org/repo
-```
-
-Defaults to `--ref main`. Pass `--ref master` / `--ref develop` for non-`main` defaults.
-
-### 2. Profile a specific tag or SHA
-
-```bash
-ayan profile --repo org/repo --ref v2.0.0
-ayan profile --repo org/repo --ref abc1234
-```
-
-### 3. Profile via positional URL
-
-```bash
-ayan profile https://github.com/org/repo
-```
+`ayan profile --repo org/repo` reads the repo at a ref (naming, error handling, tests, architecture, `.golangci.yml`, `CONTRIBUTING.md`, `CLAUDE.md`) and saves conventions to ayan's storage. Reviews for that repo then quote them. The storage must be postgres in `ayan.yaml`; with memory storage `ayan profile` refuses to run, because the results would vanish. It needs ayan's LLM key and `GITHUB_TOKEN` or `gh auth login`.
 
 ## Steps
-
-1. **Pre-flight: verify ayan + GitHub auth.**
-   ```bash
-   ayan version --check v0.0.1
-   gh auth status
-   ```
-   On non-zero exit from `ayan version --check`, stop and surface the stderr message. If `gh auth status` fails, stop and tell the user to run `gh auth login`.
-
-2. Run profile:
-   ```bash
-   ayan profile --repo <org/repo>
-   ```
-   Profiling takes 5–20 min on a large repo.
-
-3. Watch the output: each pass logs `<pass-name>: N conventions from M files`.
-
-4. Summary at end: `Profile complete: N conventions discovered, M saved (duration)`.
-
-5. Confirm to user: "Profiled <repo> at <ref>. ayan can now reference these conventions in future reviews."
+1. Pre-flight. If `command -v ayan` fails, run `${CLAUDE_PLUGIN_ROOT}/bin/install-ayan.sh`. Then `ayan version --check v0.1.0` and `gh auth status`.
+2. `ayan profile --repo <org/repo>`, or `ayan profile <URL>`. `--ref` takes a branch, tag or SHA (default `main`). It takes 5 to 20 minutes on a large repo.
+3. It ends with `Profile complete: N conventions discovered, M saved`. Report that.
+4. To use the saved conventions without ayan's LLM key, `ayan rules --repo <org/repo>` prints them with the rubric (the `local` skill does not do this by itself).
 
 ## Don'ts
-
-- Don't run profile expecting a code review — it writes to the knowledge store, doesn't post any comments.
-- Don't run profile on every PR — it's a periodic operation, not per-review.
-- Don't run profile on an unrelated fork — it ingests THAT repo's conventions.
+- Don't profile on every PR, or a repo that isn't the user's.

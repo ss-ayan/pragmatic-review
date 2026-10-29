@@ -1,9 +1,1 @@
-{
-  "name": "pragmatic-review",
-  "version": "0.3.0",
-  "description": "Comprehensive code review via the ayan bot: idiom, slop, security, static analysis, and pragmatism checks against local commits, working-tree edits, or GitHub PRs.",
-  "homepage": "https://github.com/ss-ayan/pragmatic-review",
-  "requires": {
-    "ayan_version": ">=0.0.1"
-  }
-}
+{"name":"pragmatic-review","version":"0.4.0","description":"Code review via the ayan bot: Claude Code reviews your diff against ayan's rubric and linters (no API key), or ayan reviews it with its own LLM key. Works on local commits, working-tree edits, and GitHub PRs.","homepage":"https://github.com/ss-ayan/pragmatic-review","requires":{"ayan_version":">=0.1.0"}}
