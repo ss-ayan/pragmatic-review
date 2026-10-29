@@ -28,7 +28,7 @@ Nothing reaches GitHub. The bot's GitHub credentials are still used to READ the 
 
 ## Requires
 
-This skill requires ayan **v4.0.13 or later** and either `GITHUB_TOKEN` env var or `gh auth login`. Step 1 verifies both.
+This skill requires ayan **v0.0.1 or later** and either `GITHUB_TOKEN` env var or `gh auth login`. Step 1 verifies both.
 
 ## Invocation modes
 
@@ -81,7 +81,7 @@ ayan review --dry-run --config /path/to/ayan.yaml https://github.com/org/repo/pu
 
 1. **Pre-flight: verify ayan + GitHub auth.**
    ```bash
-   ayan version --check v4.0.13
+   ayan version --check v0.0.1
    gh auth status
    ```
    On non-zero exit from `ayan version --check`, stop and surface the stderr message (install/upgrade ayan). If `gh auth status` fails, stop and tell the user to run `gh auth login`.
