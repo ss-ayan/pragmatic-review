@@ -31,7 +31,7 @@ Posting is irreversible — the comments are visible to anyone with PR access im
 
 ## Requires
 
-This skill requires ayan **v4.0.13 or later** and a `GITHUB_TOKEN` (with `repo` write scope) OR `gh auth login` with write access. Reviewer-only tokens cannot post comments. Step 1 verifies.
+This skill requires ayan **v0.0.1 or later** and a `GITHUB_TOKEN` (with `repo` write scope) OR `gh auth login` with write access. Reviewer-only tokens cannot post comments. Step 1 verifies.
 
 ## Confirmation gate
 
@@ -80,7 +80,7 @@ ayan review --only security https://github.com/org/repo/pull/42    # security-on
 
 1. **Pre-flight: verify ayan + write-scoped GitHub auth.**
    ```bash
-   ayan version --check v4.0.13
+   ayan version --check v0.0.1
    gh auth status
    ```
    On non-zero exit from `ayan version --check`, stop and surface the stderr message. If `gh auth status` shows the token lacks write access, stop and ask the user to refresh credentials.

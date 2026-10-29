@@ -30,7 +30,7 @@ Languages auto-detected from file extensions: Go, Python, Ruby (with Rails frame
 
 ## Requires
 
-This skill requires ayan **v4.0.13 or later** (for `--local`, `--only`/`--skip`, and the heartbeat). Step 1 in the recipe verifies this before running.
+This skill requires ayan **v0.0.1 or later** (for `--local`, `--only`/`--skip`, and the heartbeat). Step 1 in the recipe verifies this before running.
 
 ## Invocation modes
 
@@ -92,7 +92,7 @@ Default is the current working directory.
 
 1. **Pre-flight: verify ayan is installed and recent enough.** Run:
    ```bash
-   ayan version --check v4.0.13
+   ayan version --check v0.0.1
    ```
    On success (exit code 0), continue. On non-zero exit, stop and surface the stderr message to the user (it's either "binary not found" or "version too old; install/upgrade via https://github.com/ss-ayan"). Do NOT continue past this step.
 
